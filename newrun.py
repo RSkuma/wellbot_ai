@@ -2,13 +2,26 @@ import asyncio
 import os
 from dotenv import load_dotenv 
 from helper_functions import print_ascii_art
-import func.json
 from hume import HumeVoiceClient, MicrophoneInterface, VoiceSocket, VoiceConfig
+
+import openai
+openai.api_key = ""
+def open_ai(prompt):
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages = [{"role": "user", "content": prompt},
+        ]
+    )
+
+    return response.choices[0].message.content.strip()
+
 
 
 # Import pygame module and initialize
 import pygame
 pygame.init()
+
+
 
 # Initialize Game Variables
 text_font = pygame.font.SysFont("Comic Sans", 30)
@@ -25,11 +38,11 @@ screen = pygame.display.set_mode((1280, 720))
 # Hume EVI API Init
 load_dotenv()
 message_counter = 0
-global_socket = None
+
 
  
 def on_open():
-    print_ascii_art("Say hello to EVI, Hume AI's Empathic Voice Interface!")
+    print_ascii_art("Say hello to WellBot, Well-Co's assistant powered by Hume AI's Empathic Voice Interface!")
 
 # Handler for incoming messages
 def on_message(message):
@@ -37,7 +50,6 @@ def on_message(message):
     # Increment the message counter for each received message
     message_counter += 1
     msg_type = message["type"]
-    
 
     # Start the message box with the common header
     message_box = (
@@ -46,18 +58,33 @@ def on_message(message):
         f"{'-'*60}\n"
     )
 
-
     if msg_type is "tool_call":
-        
-        tool_call_id = message["tool_call_id"]
-        placeholder_name_yay = ""
-        if global_socket:
-            global_socket.send_tool_response(content=placeholder_name_yay tool_call_id=tool_call_id)
+        content = message["message"]["content"]
+        response = open_ai(content)
+
+        title_screen = pygame.image.load("SecondTime.png")
+        title_screen = pygame.transform.scale(title_screen, (1280,720))
+        screen.blit(title_screen, (0,0))
+
+        total_length = len(response)
+        i = 0
+        j = 51
+        current_y = 370
+        # Max length per line is 51
+        while total_length > 52:
+            draw_text(response[i:j], 320, current_y)
+            total_length -= 51
+            i += 51
+            j += 51
+            current_y += 45
+        draw_text(response[i:], 320, current_y)
+
+        pygame.display.update()
 
 
 
     # Add role and content for user and assistant messages
-    elif msg_type in {"user_message", "assistant_message"}:
+    if msg_type in {"user_message", "assistant_message"}:
         
         role = message["message"]["role"]
         content = message["message"]["content"]
@@ -116,7 +143,6 @@ def on_message(message):
 
             pygame.display.update()
 
-            if func.json is called:
 
 
 
@@ -147,7 +173,7 @@ def on_error(error):
 # Handler for when the connection is closed
 def on_close():
     # Print a closing message using ASCII art
-    print_ascii_art("Thank you for using EVI, Hume AI's Empathic Voice Interface!")
+    print_ascii_art("Thank you for using WellBot, take care!!!")
 
 
 async def user_input_handler(socket: VoiceSocket):
@@ -169,7 +195,6 @@ async def user_input_handler(socket: VoiceSocket):
 
 # Asynchronous main function to set up and run the client
 async def main() -> None:
-    global global_socket
     try:
     
         # Retrieve the Hume API key from the environment variables
@@ -182,16 +207,13 @@ async def main() -> None:
         # Start streaming EVI over your device's microphone and speakers
         async with client.connect_with_handlers(
             #insert your own configID for the bot you want"
-            #config_id="1403d06f-96b6-4802-b7b4-e5fc5ebc0363",
-            config_id = "b0a86de6-c366-496e-8076-ccf90e2cf22f",
+            config_id="5eeee856-2fc9-4407-a1ec-95ac3ddcde7d",
             on_open=on_open,                # Handler for when the connection is opened
             on_message=on_message,          # Handler for when a message is received
             on_error=on_error,              # Handler for when an error occurs
             on_close=on_close,              # Handler for when the connection is closed
             enable_audio=True,              # Flag to enable audio playback (True by default)
         ) as socket:
-            global_socket = socket
-
             # Start the microphone interface in the background; add "device=NUMBER" to specify device
             microphone_task = asyncio.create_task(MicrophoneInterface.start(socket))
 
