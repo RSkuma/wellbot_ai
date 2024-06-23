@@ -28,7 +28,7 @@ message_counter = 0
 
  
 def on_open():
-    print_ascii_art("Say hello to EVI, Hume AI's Empathic Voice Interface!")
+    print_ascii_art("Say hello to WellBot, Well-Co's assistant powered by Hume AI's Empathic Voice Interface!")
 
 # Handler for incoming messages
 def on_message(message):
@@ -135,7 +135,7 @@ def on_error(error):
 # Handler for when the connection is closed
 def on_close():
     # Print a closing message using ASCII art
-    print_ascii_art("Thank you for using EVI, Hume AI's Empathic Voice Interface!")
+    print_ascii_art("Thank you for using WellBot, take care!!!")
 
 
 async def user_input_handler(socket: VoiceSocket):
@@ -169,7 +169,7 @@ async def main() -> None:
         # Start streaming EVI over your device's microphone and speakers
         async with client.connect_with_handlers(
             #insert your own configID for the bot you want"
-            config_id="1403d06f-96b6-4802-b7b4-e5fc5ebc0363",
+            config_id="5eeee856-2fc9-4407-a1ec-95ac3ddcde7d",
             on_open=on_open,                # Handler for when the connection is opened
             on_message=on_message,          # Handler for when a message is received
             on_error=on_error,              # Handler for when an error occurs
