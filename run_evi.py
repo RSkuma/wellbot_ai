@@ -10,7 +10,7 @@ import pygame
 pygame.init()
 
 # Initialize Game Variables
-text_font = pygame.font.SysFont("Comic Sans", 60)
+text_font = pygame.font.SysFont("Comic Sans", 30)
 text_col = "Black"
 def draw_text(text, x, y):
     img = text_font.render(text,True, text_col)
@@ -57,6 +57,22 @@ def on_message(message):
         )
 
 
+        emotion1 = ["","",""]
+        index = 0
+        # Add top emotions if available
+        if "models" in message and "prosody" in message["models"]:
+            scores = message["models"]["prosody"]["scores"]
+            num = 3
+            # Get the top N emotions based on the scores
+            top_emotions = get_top_n_emotions(prosody_inferences=scores, number=num)
+
+            message_box += f"{'-'*60}\nTop {num} Emotions:\n"
+            for emotion, score in top_emotions:
+                message_box += f"{emotion}: {score:.4f}\n"
+                emotion1[index] = emotion
+                index += 1
+                
+
         if role == "user":
             title_screen = pygame.image.load("FirstTime.png")
             title_screen = pygame.transform.scale(title_screen, (1280,720))
@@ -68,22 +84,29 @@ def on_message(message):
             title_screen = pygame.transform.scale(title_screen, (1280,720))
             screen.blit(title_screen, (0,0))
 
-            draw_text("Happy", 380, 220)
-            draw_text("Sad", 735, 220)
-            draw_text("Excited", 1045, 220)
+
+            draw_text(emotion1[0], 340, 220)
+            draw_text(emotion1[1], 685, 220)
+            draw_text(emotion1[2], 1035, 220)
+
+
+            total_length = len(content)
+            i = 0
+            j = 51
+            current_y = 370
+            # Max length per line is 51
+            while total_length > 52:
+                draw_text(content[i:j], 320, current_y)
+                total_length -= 51
+                i += 51
+                j += 51
+                current_y += 45
+            draw_text(content[i:], 320, current_y)
+
             pygame.display.update()
 
 
-        # Add top emotions if available
-        if "models" in message and "prosody" in message["models"]:
-            scores = message["models"]["prosody"]["scores"]
-            num = 3
-            # Get the top N emotions based on the scores
-            top_emotions = get_top_n_emotions(prosody_inferences=scores, number=num)
 
-            message_box += f"{'-'*60}\nTop {num} Emotions:\n"
-            for emotion, score in top_emotions:
-                message_box += f"{emotion}: {score:.4f}\n"
 
     # Add all key-value pairs for other message types, excluding audio_output
     elif msg_type != "audio_output":
