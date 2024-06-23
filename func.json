@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": ["location", "service"],
+  "properties": {
+    "location" :
+    {
+        "type": "string",
+        "description": "The city, e.g. San Francisco, CA"
+    },
+    "service": {
+      "type": "string",
+      "description": "The service or resource that can be given to someone in need of it, e.g. Homeless shelters and food pantries."
+    }
+  }
+}
